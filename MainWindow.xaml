@@ -29,6 +29,11 @@
                                 <Setter Property="Visibility" Value="Collapsed" TargetName="SquareCheckBoxChecked"/>
                                 <Setter Property="Visibility" Value="Visible" TargetName="SquareCheckBoxUnchecked"/>
                             </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Visibility" Value="Collapsed" TargetName="SquareCheckBoxChecked"/>
+                                <Setter Property="Visibility" Value="Hidden" TargetName="SquareCheckBoxUnchecked"/>
+                                <Setter Property="Foreground" Value="DarkGray" TargetName="SquareCheckBoxText"/>
+                            </Trigger>
                             <Trigger Property="IsMouseOver" Value="true">
                                 <Setter Property="Visibility" Value="Collapsed" TargetName="CheckedNormal"/>
                                 <Setter Property="Visibility" Value="Collapsed" TargetName="UncheckedNormal"/>
@@ -132,7 +137,7 @@
                 </CheckBox.ToolTip>
             </CheckBox>
             <CheckBox Style="{StaticResource SquareCheckBox}" IsChecked="False" Content="Show OSC Data" Height="Auto" HorizontalAlignment="Left" VerticalAlignment="Top" 
-                  Margin="265 -35 0 10" Name="checkBoxShowOscData" Checked="CheckBoxShowOscDataChanged" Unchecked="CheckBoxShowOscDataChanged" ToolTipService.ShowDuration="12000">
+                  Margin="265 -45 0 10" Name="checkBoxShowOscData" Checked="CheckBoxShowOscDataChanged" Unchecked="CheckBoxShowOscDataChanged" ToolTipService.ShowDuration="12000">
                 <CheckBox.ToolTip>
                     <ToolTip>
                         <StackPanel>
@@ -143,7 +148,7 @@
                 </CheckBox.ToolTip>
             </CheckBox>
             <CheckBox Style="{StaticResource SquareCheckBox}" IsChecked="True" Content="Send Pos as %" Height="Auto" HorizontalAlignment="Left" VerticalAlignment="Top" 
-                  Margin="265 -11 0 10" Name="checkBoxSendPositionAsPercentage" Checked="CheckBoxSendPositionAsPercentageChanged" Unchecked="CheckBoxSendPositionAsPercentageChanged" ToolTipService.ShowDuration="12000">
+                  Margin="265 -21 0 10" Name="checkBoxSendPositionAsPercentage" Checked="CheckBoxSendPositionAsPercentageChanged" Unchecked="CheckBoxSendPositionAsPercentageChanged" ToolTipService.ShowDuration="12000">
                 <CheckBox.ToolTip>
                     <ToolTip>
                         <StackPanel>
@@ -162,7 +167,20 @@
                         <StackPanel>
                             <TextBlock FontWeight="Bold">OSC data format</TextBlock>
                             <TextBlock>If checked: OSC can be sent as one single string "Joint Name|Joint Number:x|y|z, more joints"</TextBlock>
-                            <TextBlock>If unchecked: Or each joint can be sent separately as 3 floats (x, y, z)</TextBlock>
+                            <TextBlock>If unchecked: Each joint can be sent separately as 3 floats (x, y, z) or totally separately using the checkbox below</TextBlock>
+                        </StackPanel>
+                    </ToolTip>
+                </CheckBox.ToolTip>
+            </CheckBox>
+            <CheckBox Style="{StaticResource SquareCheckBox}" IsChecked="False" Content="Send Separately" Height="Auto" HorizontalAlignment="Left" VerticalAlignment="Top" 
+                  Margin="265 -10 0 10" Name="checkBoxSendSeparately" Checked="CheckBoxSendSeparatelyChanged" Unchecked="CheckBoxSendSeparatelyChanged" ToolTipService.ShowDuration="12000" IsEnabled="True">
+                <CheckBox.ToolTip>
+                    <ToolTip>
+                        <StackPanel>
+                            <TextBlock FontWeight="Bold">Toggle Sending data separately</TextBlock>
+                            <TextBlock>If checked: OSC will be sent as individual osc data elements "/skeleton#/JointName/x/#.##" etc...</TextBlock>
+                            <TextBlock>This is useful for sending to software that can't handle osc bundles.</TextBlock>
+                            <TextBlock>If unchecked: Each joint will be sent separately as 3 floats (x, y, z)</TextBlock>
                         </StackPanel>
                     </ToolTip>
                 </CheckBox.ToolTip>
