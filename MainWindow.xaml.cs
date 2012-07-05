@@ -1,6 +1,7 @@
 ﻿
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Input;
 
 namespace KinectOSC
 {
@@ -120,6 +121,11 @@ namespace KinectOSC
         /// If this is true then each variable of each of the joints will be sent separately (each osc element will have one float)
         /// </summary>
         private bool sendAllSeparately = false;
+
+        /// <summary>
+        /// If this is true then each variable of each of the joints will be sent separately (each osc element will have one float)
+        /// </summary>
+        private string oscAddress = "";
 
         /// <summary>
         /// Active Kinect sensor
@@ -260,6 +266,9 @@ namespace KinectOSC
             oscWriter = new UdpWriter(oscArgs[0], Convert.ToInt32(oscArgs[1]));
 
 
+            // Initialize Data viewer
+            oscViewer.Text = "\nData will be shown here\nwhen there is a skeleton\nbeing tracked.";
+
         }
 
         /// <summary>
@@ -382,8 +391,13 @@ namespace KinectOSC
                                             // concatenate all joints as one big string to send as OSC
                                             args += jointName + "|" + jointNumber + ":" + (float)jointPosition.X + "|" +
                                                     (float)jointPosition.Y + "|" + (float)Math.Round(joint.Position.Z, 3) + ",";
-                                            if (showOscData) {
-                                                oscText += GenerateOscDataDump(counter, jointName, joint.Position, jointPosition);
+                                            if (showOscData)
+                                            {
+                                                oscText += "\n" + jointName + "|" + jointNumber + ":" + 
+                                                           (float) jointPosition.X + "|" +
+                                                           (float) jointPosition.Y + "|" +
+                                                           (float) Math.Round(joint.Position.Z, 3) + ",";
+                                                //GenerateOscDataDump(counter, jointName, joint.Position, jointPosition);
                                             }
                                         }
                                         else {
@@ -391,8 +405,13 @@ namespace KinectOSC
                                             args += jointName + "|" + jointNumber + ":" + (float)Math.Round(joint.Position.X, 4) + "|" +
                                                     (float)Math.Round(joint.Position.Y, 4) + "|" + (float)Math.Round(joint.Position.Z, 4) + ",";
 
-                                            if (showOscData) {
-                                                oscText += GenerateOscDataDump(counter, jointName, joint.Position);
+                                            if (showOscData)
+                                            {
+                                                oscText += "\n" + jointName + "|" + jointNumber + ":" +
+                                                           (float) Math.Round(joint.Position.X, 4) + "|" +
+                                                           (float) Math.Round(joint.Position.Y, 4) + "|" +
+                                                           (float) Math.Round(joint.Position.Z, 4) + ",";
+                                                //GenerateOscDataDump(counter, jointName, joint.Position);
                                             }
                                         }
 
@@ -406,11 +425,13 @@ namespace KinectOSC
                                     {
                                         // joints all sent individually as floats
                                         // Ex: "/skeleton#/JointName/x/#.##", "/skeleton#/JointName/y/#.##", "/skeleton#/JointName/z/#.##"
+                                        var address = "";
                                         foreach (Joint joint in skel.Joints)
                                         {
                                             var jointName = joint.JointType.ToString();
                                             var jointElement = new List<OscElement>();
                                             Point jointPosition = SkeletonPointToScreen(joint.Position);
+                                            address = "/skeleton" + counter + "/" + jointName;
                                             if (sendPositionsAsPercentage)
                                             {
                                                 jointPosition.X = Math.Round(jointPosition.X/640, 3);
@@ -419,15 +440,28 @@ namespace KinectOSC
                                                 //oscWriter.Send(new OscBundle(DateTime.Now, jointElement.ToArray()));
 
                                                 var jointElements = new List<OscElement>();
-                                                jointElements.Add(
-                                                    new OscElement("/skeleton" + counter + "/" + jointName + "/x",
-                                                                   (float) jointPosition.X));
-                                                jointElements.Add(
-                                                    new OscElement("/skeleton" + counter + "/" + jointName + "/y",
-                                                                   (float) jointPosition.Y));
-                                                jointElements.Add(
-                                                    new OscElement("/skeleton" + counter + "/" + jointName + "/z",
-                                                                   (float) Math.Round(joint.Position.Z, 3)));
+                                                if (oscAddress != "") {
+                                                    jointElements.Add(new OscElement(oscAddress + counter,
+                                                                                     (float)jointPosition.X));
+                                                    counter++;
+                                                    jointElements.Add(new OscElement(oscAddress + counter,
+                                                                                     (float)jointPosition.Y));
+                                                    counter++;
+                                                    jointElements.Add(new OscElement(oscAddress + counter,
+                                                                                     (float)
+                                                                                     Math.Round(joint.Position.Z, 3)));
+                                                    counter++;
+                                                }
+                                                else
+                                                {
+                                                    jointElements.Add(new OscElement(address + "/x",
+                                                                                     (float)jointPosition.X));
+                                                    jointElements.Add(new OscElement(address + "/y",
+                                                                                     (float)jointPosition.Y));
+                                                    jointElements.Add(new OscElement(address + "/z",
+                                                                                     (float)
+                                                                                     Math.Round(joint.Position.Z, 3)));
+                                                }
                                                 oscWriter.Send(new OscBundle(DateTime.Now, jointElements.ToArray()));
 
                                                 if (showOscData)
@@ -439,15 +473,32 @@ namespace KinectOSC
                                             else
                                             {
                                                 var jointElements = new List<OscElement>();
-                                                jointElements.Add(
-                                                    new OscElement("/skeleton" + counter + "/" + jointName + "/x",
-                                                                   (float) Math.Round(joint.Position.X, 4)));
-                                                jointElements.Add(
-                                                    new OscElement("/skeleton" + counter + "/" + jointName + "/y",
-                                                                   (float) Math.Round(joint.Position.Y, 4)));
-                                                jointElements.Add(
-                                                    new OscElement("/skeleton" + counter + "/" + jointName + "/z",
-                                                                   (float) Math.Round(joint.Position.Z, 4)));
+                                                if (oscAddress != "") {
+                                                    jointElements.Add(new OscElement(oscAddress + counter,
+                                                                                     (float)
+                                                                                     Math.Round(joint.Position.X, 4)));
+                                                    counter++;
+                                                    jointElements.Add(new OscElement(oscAddress + counter,
+                                                                                     (float)
+                                                                                     Math.Round(joint.Position.Y, 4)));
+                                                    counter++;
+                                                    jointElements.Add(new OscElement(oscAddress + counter,
+                                                                                     (float)
+                                                                                     Math.Round(joint.Position.Z, 4)));
+                                                    counter++;
+                                                }
+                                                else
+                                                {
+                                                    jointElements.Add(new OscElement(address + "/x",
+                                                                                     (float)
+                                                                                     Math.Round(joint.Position.X, 4)));
+                                                    jointElements.Add(new OscElement(address + "/y",
+                                                                                     (float)
+                                                                                     Math.Round(joint.Position.Y, 4)));
+                                                    jointElements.Add(new OscElement(address + "/z",
+                                                                                     (float)
+                                                                                     Math.Round(joint.Position.Z, 4)));                                                    
+                                                }
                                                 oscWriter.Send(new OscBundle(DateTime.Now, jointElements.ToArray()));
                                                 if (showOscData)
                                                 {
@@ -527,18 +578,34 @@ namespace KinectOSC
         private String GenerateOscDataDump(int counter, string jointName, SkeletonPoint jointPoint)
         {
             var dataDump = "";
-            dataDump += "/skeleton" + counter + "/" + jointName + "/x" + Math.Round(jointPoint.X, 4) + "\n";
-            dataDump += "/skeleton" + counter + "/" + jointName + "/y" + Math.Round(jointPoint.Y, 4) + "\n";
-            dataDump += "/skeleton" + counter + "/" + jointName + "/z" + Math.Round(jointPoint.Z, 4) + "\n";
+            if (oscAddress != "") {
+                dataDump += oscAddress + (counter-3) + "/" + Math.Round(jointPoint.X, 4) + "\n";
+                dataDump += oscAddress + (counter-2) + "/" + Math.Round(jointPoint.Y, 4) + "\n";
+                dataDump += oscAddress + (counter-1) + "/" + Math.Round(jointPoint.Z, 4) + "\n";
+            }
+            else
+            {
+                dataDump += "/skeleton" + counter + "/" + jointName + "/x" + Math.Round(jointPoint.X, 4) + "\n";
+                dataDump += "/skeleton" + counter + "/" + jointName + "/y" + Math.Round(jointPoint.Y, 4) + "\n";
+                dataDump += "/skeleton" + counter + "/" + jointName + "/z" + Math.Round(jointPoint.Z, 4) + "\n";
+            }
             return dataDump;
         }
 
         private String GenerateOscDataDump(int counter, string jointName, SkeletonPoint jointPoint, Point jointPosition)
         {
             var dataDump = "";
-            dataDump += "/skeleton" + counter + "/" + jointName + "/x" + Math.Round(jointPosition.X, 3) + "\n";
-            dataDump += "/skeleton" + counter + "/" + jointName + "/y" + Math.Round(jointPosition.Y, 3) + "\n";
-            dataDump += "/skeleton" + counter + "/" + jointName + "/z" + Math.Round(jointPoint.Z, 3) + "\n";
+            if (oscAddress != "") {
+                dataDump += oscAddress + (counter - 3) + "/" + Math.Round(jointPosition.X, 3) + "\n";
+                dataDump += oscAddress + (counter - 2) + "/" + Math.Round(jointPosition.Y, 3) + "\n";
+                dataDump += oscAddress + (counter - 1) + "/" + Math.Round(jointPoint.Z, 3) + "\n";
+            }
+            else
+            {
+                dataDump += "/skeleton" + counter + "/" + jointName + "/x" + Math.Round(jointPosition.X, 3) + "\n";
+                dataDump += "/skeleton" + counter + "/" + jointName + "/y" + Math.Round(jointPosition.Y, 3) + "\n";
+                dataDump += "/skeleton" + counter + "/" + jointName + "/z" + Math.Round(jointPoint.Z, 3) + "\n";
+            }
             return dataDump;
         }
 
@@ -740,6 +807,10 @@ namespace KinectOSC
         private void CheckBoxSendSeparatelyChanged(object sender, RoutedEventArgs e)
         {
             sendAllSeparately = this.checkBoxSendSeparately.IsChecked.GetValueOrDefault();
+            if (sendAllSeparately)
+            {
+                OscAddress.IsEnabled = true;
+            }
         }
         private void ChangePortClicked(object sender, RoutedEventArgs e)
         {
@@ -752,6 +823,37 @@ namespace KinectOSC
             oscViewer.Visibility = Visibility.Collapsed;
             CloseOscViewer.Visibility = Visibility.Collapsed;
             checkBoxShowOscData.IsChecked = false;
+        }
+
+        private void ChangeAddressClicked(object sender, RoutedEventArgs e)
+        {
+            UpdateOscAddress();
+        }
+
+        private void OscAddressKeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                UpdateOscAddress();
+            }
+        }
+
+        private void UpdateOscAddress()
+        {
+            oscAddress = OscAddress.Text;
+            if (oscAddress.Substring(0, 1) != "/") {
+                oscAddress = "/" + oscAddress;
+                OscAddress.Text = oscAddress;
+                ChangeAddress.Focus();
+            }
+        }
+
+        private void OscPortKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter) {
+                oscArgs[1] = OscPort.Text;
+                oscWriter = new UdpWriter(oscArgs[0], Convert.ToInt32(oscArgs[1]));
+            }
         }
     }
 }
