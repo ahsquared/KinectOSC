@@ -905,11 +905,14 @@ namespace KinectOSC
         private void UpdateOscAddress()
         {
             oscAddress = OscAddress.Text;
-            if (oscAddress.Substring(0, 1) != "/")
+            if (oscAddress != "")
             {
-                oscAddress = "/" + oscAddress;
-                OscAddress.Text = oscAddress;
-                ChangeAddress.Focus();
+                if (oscAddress.Substring(0, 1) != "/")
+                {
+                    oscAddress = "/" + oscAddress;
+                    OscAddress.Text = oscAddress;
+                    ChangeAddress.Focus();
+                }
             }
         }
 

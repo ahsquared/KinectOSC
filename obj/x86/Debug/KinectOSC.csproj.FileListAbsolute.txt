@@ -41,7 +41,6 @@ C:\Users\Andre\Documents\GitHub\KinectOSC\bin\Debug\Bespoke.Common.dll
 C:\Users\Andre\Documents\GitHub\KinectOSC\bin\Debug\Bespoke.Common.Osc.dll
 C:\Users\Andre\Documents\GitHub\KinectOSC\bin\Debug\Ventuz.OSC.dll
 C:\Users\Andre\Documents\GitHub\KinectOSC\bin\Debug\Ventuz.OSC.xml
-C:\Users\Andre\Documents\GitHub\KinectOSC\obj\x86\Debug\ResolveAssemblyReference.cache
 C:\Users\Andre\Documents\GitHub\KinectOSC\obj\x86\Debug\MainWindow.baml
 C:\Users\Andre\Documents\GitHub\KinectOSC\obj\x86\Debug\MainWindow.g.cs
 C:\Users\Andre\Documents\GitHub\KinectOSC\obj\x86\Debug\App.g.cs
@@ -49,5 +48,5 @@ C:\Users\Andre\Documents\GitHub\KinectOSC\obj\x86\Debug\KinectOSC_Content.g.cs
 C:\Users\Andre\Documents\GitHub\KinectOSC\obj\x86\Debug\KinectOSC_MarkupCompile.cache
 C:\Users\Andre\Documents\GitHub\KinectOSC\obj\x86\Debug\KinectOSC.g.resources
 C:\Users\Andre\Documents\GitHub\KinectOSC\obj\x86\Debug\KinectOSC.Properties.Resources.resources
-C:\Users\Andre\Documents\GitHub\KinectOSC\obj\x86\Debug\GenerateResource.read.1.tlog
-C:\Users\Andre\Documents\GitHub\KinectOSC\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\Users\Andre\Documents\GitHub\KinectOSC\obj\x86\Debug\KinectOSC.csprojResolveAssemblyReference.cache
+C:\Users\Andre\Documents\GitHub\KinectOSC\obj\x86\Debug\KinectOSC.csproj.GenerateResource.Cache
